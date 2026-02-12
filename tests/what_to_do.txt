@@ -1,0 +1,43 @@
+1)  -> Check dashboard 
+ 
+ - primary header items (hamburger menu, swag labs name, and the shopping cart img
+ 
+ - Secondary header: products, filter
+
+ first to check if i am on Dashboard page
+ * Check inventory.html in url
+ * Swag page as Page title
+ * Check The cart button is visible
+
+2) Check the Product images, Title , Price are correct as same as our database Maybeee / POM
+
+visibility  : Add to cart,  
+
+2.999) Click on each product to check the details saparately
+
+3) Add One item to cart from the page -> button changes to "Remove" and cart is updated.
+
+4) Add all of the items to cart -> Sequential checks : Add to cart works, remove displays ,Cart is updated
+
+5) We already added all the items to cart, Now Seq. Click Remove button, check cart updates, Add to cart displays
+
+6) Validate for all filter button , Checks if the filter works on the items
+
+** One test with no item added 
+** One test with few items
+** One test with all the items
+
+7) Cookie And State Save Test : Is the product still on the cart after logged out
+
+** One test with no item added 
+** One test with few items
+** One test with all the items
+
+NOTE : 
+If Item is added -> click on item -> See the product is still added to cart
+ 
+5) If i added some product in cart , And i go to shopping cart , Is the products really added on the cart 
+
+
+NOTE 2 : 
+What happens with the other users on the Page
