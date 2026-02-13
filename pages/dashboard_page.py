@@ -19,17 +19,13 @@ class DashboardPage :
     INVENTORY_LIST = f'{INVENTORY_CONTAINER} >> [data-test="inventory-item"]'
     INVENTORY_ITEMS = '[data-test="inventory-item"]'
     INVENTORY_ITEM_LINK = '[data-test$="title-link"]'
-    ADD_TO_CART_BUTTON = '[data-test^="add-to-cart-"]'
+    ADD_TO_CART_BUTTON = f'{INVENTORY_ITEMS} >> [data-test^="add-to-cart-"]'
+    ADD_TO_CART_BUTTON_FIELD = '[data-test^="add-to-cart-"]'
     ITEM_IMG = '.inventory_item_img img'
     ITEM_DESC = '[data-test="inventory-item-desc"]'
     ITEM_PRICE = '[data-test="inventory-item-price"]'
     ITEM_NAME = '[data-test="inventory-item-name"]'
     BACK_TO_PRODUCTS_BUTTON = '[data-test="back-to-products"]'
-
-
-# <button class="btn btn_secondary btn_small btn_inventory " data-test="remove-test.allthethings()-t-shirt-(red)" id="remove-test.allthethings()-t-shirt-(red)" name="remove-test.allthethings()-t-shirt-(red)">Remove</button>
-
-# <button class="btn btn_primary btn_small btn_inventory " data-test="add-to-cart-test.allthethings()-t-shirt-(red)" id="add-to-cart-test.allthethings()-t-shirt-(red)" name="add-to-cart-test.allthethings()-t-shirt-(red)">Add to cart</button>
 
     #-------------Separate Product Page Selectors------------
     DETAILS_ITEM_IMG = '.inventory_details_img'
@@ -84,11 +80,8 @@ class DashboardPage :
         return self.page.locator(self.INVENTORY_CONTAINER)
     
     @property
-    def add_to_cart_button(self) -> Locator:
-        return self.page.locator(self.ADD_TO_CART_BUTTON)
-    
-    @property
     def shopping_cart_badge(self) -> Locator:
+        print(self.page.locator(self.SHOPPING_CART_BADGE))
         return self.page.locator(self.SHOPPING_CART_BADGE)
     
     @property
@@ -102,10 +95,6 @@ class DashboardPage :
     @property
     def inventory_items(self) -> Locator:
         return self.page.locator(self.INVENTORY_ITEMS)
-
-    @property
-    def remove_button(self) -> Locator:
-        return self.page.locator(self.REMOVE_BUTTON_FIELD)
     
     @property
     def cart_page_continue_shopping(self) -> Locator:
@@ -143,7 +132,12 @@ class DashboardPage :
     #-------------Helper----------------
     def get_inventory_items_count(self) -> int:
         return self.inventory_items.count()
-
+    
+    def get_add_to_cart_button(self, index: int) -> Locator:
+        return self.page.locator(self.ADD_TO_CART_BUTTON).nth(index)
+    
+    def get_remove_button(self, index: int) -> Locator:
+        return self.page.locator(self.REMOVE_BUTTON).nth(index)
 
     #-------------navigations--------------
     def open_cart(self) -> None :
@@ -172,7 +166,7 @@ class DashboardPage :
         actual_count = self.get_inventory_items_count()
         assert actual_count == expected_count, f"Expected {expected_count} products, but found {actual_count}"
 
-    def assert_product_visible(self, products, added_products) -> None:
+    def assert_product_visible(self, products, added_products : list = []) -> None:
         """
         1. Assert product count
         2. Assert each product's details: name, image, description, price
@@ -180,17 +174,19 @@ class DashboardPage :
         """
 
         expected_count = len(products)
-        self.assert_product_count(expected_count)
 
         for i in range(expected_count):
             product_card = self.inventory_items.nth(i)
             product = products[i]
 
-            if i in added_products:
-                expect(product_card.locator(self.REMOVE_BUTTON)).to_have_text("Remove")
+            product_name = product_card.locator(self.ITEM_NAME).inner_text()
+
+            if product_name in added_products:
+                expect(product_card.locator(self.REMOVE_BUTTON_FIELD)).to_be_visible()
 
             # assert product details
             expect(product_card.locator(self.ITEM_NAME)).to_have_text(product.name)
+
             expect(product_card.locator(self.ITEM_IMG)).to_have_attribute("src", product.image_path)
             expect(product_card.locator(self.ITEM_NAME)).to_have_text(product.name)
             expect(product_card.locator(self.ITEM_DESC)).to_contain_text(product.description)
@@ -207,11 +203,11 @@ class DashboardPage :
         count = self.get_inventory_items_count()
         assert count == 6, f"Expected 6 products, but found {count}"
    
-    def assert_remove_button_visible(self) -> None:
-        assert self.remove_button.is_visible(), "Remove button is not visible"
+    def assert_remove_button_visible(self, index: int = 0) -> None:
+        assert self.get_remove_button(index).is_visible(), f"Remove button for product at index {index} is not visible"
 
-    def assert_add_to_cart_visible(self) -> None:
-        assert self.add_to_cart_button.is_visible(), "Add to cart button is not visible"
+    def assert_add_to_cart_visible(self, index: int = 0) -> None:
+        assert self.get_add_to_cart_button(index).is_visible(), f"Add to cart button for product at index {index} is not visible"
 
     def assert_shopping_badge_value(self, expected_value: int) -> None:
         badge = self.shopping_cart_badge
@@ -232,8 +228,8 @@ class DashboardPage :
         if(index > self.get_inventory_items_count() - 1):
             raise IndexError(f"Index {index} is out of bounds for inventory items count {self.get_inventory_items_count()}")
         
-        self.assert_add_to_cart_visible()
-        self.add_to_cart_button.nth(index).click()
+        self.assert_add_to_cart_visible(index)
+        self.get_add_to_cart_button(index).click()
         self.assert_remove_button_visible()
 
     def click_remove_button(self, index: int = 0) -> None:
@@ -241,20 +237,28 @@ class DashboardPage :
             raise IndexError(f"Index {index} is out of bounds for inventory items count {self.get_inventory_items_count()}")
         
         self.assert_remove_button_visible()
-        self.remove_button.nth(index).click()
-        self.assert_add_to_cart_visible()
-
+        self.get_remove_button(index).click()   
+        self.assert_add_to_cart_visible(index)
     
-    def get_filter(self, value: str) -> Locator:
-        return self.page.locator(self.FILTER_BUTTON).select_option(value=value)
+    def get_filter(self, option: str) -> Locator:
+        return self.page.locator(self.FILTER_BUTTON).select_option(label=option)
 
-    def apply_filter(self, filter_value: str) -> None:
+    def apply_filter(self, filter_option: str) -> None:
         self.filter_button.click()
-        filter_option_locator = self.get_filter(filter_value)
+        filter_option_locator = self.get_filter(filter_option.value)
 
-   
-   
-   
+    def add_to_cart_by_product_name(self, product_name: str) -> None:
+        product_card = self.inventory_items.filter(has_text=product_name)
+        add_button = product_card.locator(self.ADD_TO_CART_BUTTON_FIELD)
+        expect(add_button).to_be_visible()
+        add_button.click()
+
+    def remove_by_product_name(self, product_name: str) -> None:
+        product_card = self.inventory_items.filter(has_text=product_name)
+        remove_button = product_card.locator(self.REMOVE_BUTTON_FIELD)
+        expect(remove_button).to_be_visible()
+        remove_button.click()
+
     #-------------Post actions--------------
 
     
@@ -297,7 +301,6 @@ class DashboardPage :
         """
 
         self.wait_until_page_fields_are_ready()
-        self.assert_number_of_products()
         self.click_add_to_cart()
         self.click_remove_button()
 

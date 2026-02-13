@@ -1,50 +1,62 @@
 import re
+import time
 from typing import List
 import pytest
-from playwright.sync_api import Locator, expect
+from playwright.sync_api import Locator, expect, Page
 from pages.dashboard_page import DashboardPage
-from utils import FilterValue, Product, products
+from test_data.product_data import  Product, products
+from test_data.filter_data import Filter
 
-
-def test_filter_with_no_items(login_as_standard_user):
+@pytest.mark.parametrize(
+        "filter_option",
+        list(Filter)[1:],
+)
+def test_filter_with_no_items(login_as_standard_user, filter_option):
     """
     1. Logs in as a standard user and navigates to the inventory page.
     2. Iterate through each filter option, applies it, and verifies that the products are displayed in the correct order based on the applied filter.
     """
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)
-    dashboard_page.is_inventory_page()
+    #apply the filter in ui
+    dashboard_page.apply_filter(filter_option)
 
-    filters = list(FilterValue)
+    # apply filter in sorted list
+    sorted_products = Product.sort_products(products, filter_option)
 
-    for filter in filters[1:] :
-        print(f"Applying filter: {filter.filter_name}")
-        dashboard_page.apply_filter(filter.filter_value)
+    dashboard_page.assert_product_visible(sorted_products, [])
 
-        sorted_products = Product.sort_products(products, filter)
-        dashboard_page.assert_product_visible(sorted_products, [])
 
-def test_filter_with_items_in_cart(login_as_standard_user):
+@pytest.mark.parametrize(
+        "filter_option",
+        list(Filter)[1:],
+)
+def test_filter_with_some_items_added_to_cart(add_some_products, filter_option):
     """
-    1. Logs in as a standard user and navigates to the inventory page.
-    2. Adds a few products to the cart.
-    3. Iterate through each filter option, applies it, and verifies that the products are displayed in the correct order based on the applied filter, ensuring that the cart functionality does not interfere with the sorting.
+    1. Logs in as a standard user, navigates to the inventory page, and adds a few random products to the cart.
+    2. Iterates through each filter option, applies it, and verifies that the products are displayed in the correct order based on the applied filter.
     """
-    page = login_as_standard_user
+    page , added_products = add_some_products
     dashboard_page = DashboardPage(page)
-    dashboard_page.is_inventory_page()
 
-    # Add first two products to cart
-    dashboard_page.click_add_to_cart(index=2)
-    dashboard_page.click_add_to_cart(index=3)
+    dashboard_page.apply_filter(filter_option)
+    sorted_products = Product.sort_products(products, filter_option)
+    dashboard_page.assert_product_visible(products= sorted_products, added_products= added_products)
 
-    added_products = [2,3]
 
-    filters = list(FilterValue)
+@pytest.mark.parametrize(
+        "filter_option",
+        list(Filter)[1:],
+)
+def test_filter_with_all_items_added_to_cart(add_all_products, filter_option):
+    """
+    1. Logs in as a standard user, navigates to the inventory page, add all the products to the cart
+    2. Iterate through each filter option, applies it
+    3. Verfies if the Products are in correct order as expected
+    """
 
-    for filter in filters[1:] :
-        print(f"Applying filter: {filter.filter_name}")
-        dashboard_page.apply_filter(filter.filter_value)
-
-        sorted_products = Product.sort_products(products, filter)
-        dashboard_page.assert_product_visible(sorted_products, added_products)
+    page = add_all_products
+    dashboard_page = DashboardPage(page)
+    dashboard_page.apply_filter(filter_option)
+    sorted_products = Product.sort_products(products, filter_option)
+    dashboard_page.assert_product_visible(products= sorted_products, added_products= products)

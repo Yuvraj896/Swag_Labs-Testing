@@ -1,6 +1,6 @@
 from ast import List
 from dataclasses import dataclass
-from enum import Enum
+from test_data.filter_data import Filter
 
 @dataclass
 class Product:
@@ -11,28 +11,16 @@ class Product:
 
     
     @classmethod
-    def sort_products(cls, products: List["Product"], filter_option: "FilterValue") -> List["Product"]:
-        if filter_option in [FilterValue.NAME_ASC, FilterValue.NAME_DESC]:
-            reverse = filter_option == FilterValue.NAME_DESC
+    def sort_products(cls, products: List["Product"], filter_option: "Filter") -> List["Product"]:
+        if filter_option in [Filter.NAME_ASC, Filter.NAME_DESC]:
+            reverse = filter_option == Filter.NAME_DESC
             return sorted(products, key=lambda p: p.name, reverse=reverse)
         
-        elif filter_option in [FilterValue.PRICE_ASC, FilterValue.PRICE_DESC]:
-            reverse = filter_option == FilterValue.PRICE_DESC
+        elif filter_option in [Filter.PRICE_ASC, Filter.PRICE_DESC]:
+            reverse = filter_option == Filter.PRICE_DESC
             return sorted(products, key=lambda p: p.price, reverse=reverse)
         
         return products  # fallback if unknown filter
-
-
-class FilterValue(Enum):
-    NAME_ASC = ("Name (A to Z)", "az")
-    NAME_DESC = ("Name (Z to A)", "za")
-    PRICE_ASC = ("Price (low to high)", "lohi")
-    PRICE_DESC = ("Price (high to low)", "hilo")
-
-    def __init__(self, name, value):
-        self.filter_name = name
-        self.filter_value = value
-
 
 products = [
     Product(
@@ -74,3 +62,5 @@ products = [
 ]
 
 
+for val in Filter:
+    print(val)
