@@ -51,6 +51,12 @@ def login_as_visual_user(login):
 
 
 @pytest.fixture(scope="function")
+def add_no_products(login_as_standard_user):
+    page = login_as_standard_user
+    return page, []
+
+
+@pytest.fixture(scope="function")
 def add_all_products(login_as_standard_user):
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)
@@ -60,7 +66,7 @@ def add_all_products(login_as_standard_user):
     for product in products:
         dashboard_page.add_to_cart_by_product_name(product.name)
 
-    return page
+    return page, products
 
 
 @pytest.fixture(scope="function")
@@ -76,3 +82,9 @@ def add_some_products(login_as_standard_user):
         dashboard_page.add_to_cart_by_product_name(product.name)
 
     return page, random_products
+
+
+
+@pytest.fixture
+def cart_state(request):
+    return request.getfixturevalue(request.param)

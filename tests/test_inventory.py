@@ -80,3 +80,20 @@ def test_all_products_cart_and_remove_functionality(add_all_products):
         dashboard_page.click_remove_button()
 
     dashboard_page.assert_shopping_badge_value(0)
+
+
+
+def test_product_images(login_as_standard_user, assert_snapshot, subtests):
+    page = login_as_standard_user
+    dashboard_page = DashboardPage(page)
+
+    expected_count = len(products)
+
+    for i in range(expected_count):
+        # Change 2: Use the 'subtests' fixture here
+        with subtests.test(msg=f"Product {i+1} image"):
+            product_card = dashboard_page.inventory_items.nth(i)
+            product_image = product_card.locator(dashboard_page.ITEM_IMG)
+        
+            ss = product_image.screenshot()
+            assert_snapshot(ss, name=f"product_{i+1}_image.png")

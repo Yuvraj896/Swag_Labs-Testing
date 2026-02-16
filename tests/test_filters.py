@@ -55,8 +55,33 @@ def test_filter_with_all_items_added_to_cart(add_all_products, filter_option):
     3. Verfies if the Products are in correct order as expected
     """
 
-    page = add_all_products
+    page, _ = add_all_products
     dashboard_page = DashboardPage(page)
     dashboard_page.apply_filter(filter_option)
     sorted_products = Product.sort_products(products, filter_option)
     dashboard_page.assert_product_visible(products= sorted_products, added_products= products)
+
+
+
+#-----------------Parametrize over cart_state and filter_option --> Indirect param -----------------
+
+@pytest.mark.parametrize(
+    "cart_state", 
+    [
+        "add_no_products",
+        "add_some_products",
+        "add_all_products"
+    ],
+    indirect=True
+)
+@pytest.mark.parametrize(
+    "filter_option",
+    list(Filter)[1:]
+)
+def test_filter_behaviour(cart_state, filter_option):
+    page, added_products = cart_state
+    
+    dashboard_page = DashboardPage(page)
+    dashboard_page.apply_filter(filter_option=filter_option)
+    sorted_products = Product.sort_products(products, filter_option)
+    dashboard_page.assert_product_visible(products=sorted_products, added_products=added_products)

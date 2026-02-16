@@ -1,6 +1,5 @@
 from playwright.sync_api import Locator, Page, expect
 import re
-import pytest
 
 class DashboardPage :
 
@@ -8,6 +7,8 @@ class DashboardPage :
     PRIMARY_HEADER = '[data-test="primary-header"]'
     BURGER_MENU_BUTTON = f'{PRIMARY_HEADER} >> #react-burger-menu-btn'    
     SHOPPING_CART_BUTTON = '[data-test="shopping-cart-link"]'
+    LOGOUT_BUTTON = f'{PRIMARY_HEADER} >> #logout_sidebar_link'
+
 
 
     SECONDARY_HEADER = '[data-test="secondary-header"]'
@@ -127,7 +128,12 @@ class DashboardPage :
     @property
     def details_item_img(self) -> Locator:
         return self.page.locator(self.DETAILS_ITEM_IMG)
+    
+    @property
+    def logout_button(self) -> Locator:
+        return self.page.locator(self.LOGOUT_BUTTON)
 
+    
 
     #-------------Helper----------------
     def get_inventory_items_count(self) -> int:
@@ -166,7 +172,7 @@ class DashboardPage :
         actual_count = self.get_inventory_items_count()
         assert actual_count == expected_count, f"Expected {expected_count} products, but found {actual_count}"
 
-    def assert_product_visible(self, products, added_products : list = []) -> None:
+    def assert_product_visible(self, products, added_products : list = [] )-> None:
         """
         1. Assert product count
         2. Assert each product's details: name, image, description, price
@@ -258,6 +264,12 @@ class DashboardPage :
         remove_button = product_card.locator(self.REMOVE_BUTTON_FIELD)
         expect(remove_button).to_be_visible()
         remove_button.click()
+
+
+    def logout(self) -> None:
+        self.burger_menu_button.click()
+        self.logout_button.click()
+
 
     #-------------Post actions--------------
 
