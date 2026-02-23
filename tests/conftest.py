@@ -11,9 +11,14 @@ from pages.checkout_page import CheckoutPage
 from test_data.product_data import products, allowed_cart
 
 @pytest.fixture(scope="function")
-def browser():
+def browser(pytestconfig):
+    browser_name = pytestconfig.getoption("browser")
+    # default to chromium if no browser is specified
+    browser_name = browser_name[0] if browser_name else "chromium" 
+
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=500)
+        browser_type = getattr(p, browser_name)
+        browser = browser_type.launch(headless=False)
         yield browser
         browser.close()
 

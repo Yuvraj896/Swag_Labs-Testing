@@ -6,6 +6,7 @@ from test_data.product_data import products, allowed_cart
 from test_data.filter_data import Filter
 
 
+@pytest.mark.smoke
 def test_dashboard_elements_visibility(login_as_standard_user):
     """
     1. Logs in as a standard user and navigates to the inventory page.

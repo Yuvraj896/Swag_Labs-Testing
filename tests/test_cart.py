@@ -6,6 +6,7 @@ from pages.cart_page import CartPage
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 
+@pytest.mark.smoke
 @pytest.mark.parametrize("user", ["login_as_standard_user"], indirect=True)
 def test_cart_elements_visibility(cart_page_navigate):
     """
@@ -31,6 +32,7 @@ def test_cart_elements_visibility(cart_page_navigate):
      ],
      indirect= True
 )
+@pytest.mark.smoke
 def test_cart_products_visibility(cart_page_with_products, user) :
     """
     1. Login for each user and add Required items to the cart and navigate to the cart page

@@ -7,6 +7,8 @@ from pages.dashboard_page import DashboardPage
 from test_data.product_data import  Product, products
 from test_data.filter_data import Filter
 
+pytestmark = pytest.mark.filters
+
 #-----------------Parametrize over cart_state and filter_option --> Indirect param -----------------
 
 @pytest.mark.parametrize(
@@ -22,6 +24,8 @@ from test_data.filter_data import Filter
     "filter_option",
     list(Filter)[1:]
 )
+@pytest.mark.smoke
+@pytest.mark.filters
 def test_filter_behaviour(cart_state, filter_option):
     page, added_products = cart_state
     
