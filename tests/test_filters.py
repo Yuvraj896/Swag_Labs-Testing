@@ -41,7 +41,7 @@ def test_problem_user_filter(login_as_problem_user, filter_option):
     dashboard_page.apply_filter(filter_option=filter_option)
 
     dashboard_page.assert_filter_applied(expected_filter= filter_option)
-    dashboard_page.filter_behaviour_on_other_users(products= products)
+    dashboard_page.filter_behaviour_on_problem_user(products= products)
     
 
 @pytest.mark.parametrize(
@@ -59,15 +59,12 @@ def test_error_user_filter(login_as_error_user, filter_option):
     page = login_as_error_user
     dashboard_page = DashboardPage(page)
 
-    dialog_message = None
+    dashboard_page.dialog_message = None
 
     
     # add a method in the dashboard class to handle dialogs
-
-    page.on("dialog", )
-
+    page.on("dialog", dashboard_page.handle_dialog )
     dashboard_page.apply_filter(filter_option=filter_option)
     
-    assert dialog_message is not None
-
+    assert dashboard_page.dialog_message is not None
     dashboard_page.assert_filter_applied(expected_filter= filter_option)

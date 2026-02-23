@@ -5,3 +5,4 @@ pytest-playwright-visual==2.1.2
 pixelmatch==0.3.0
 pytest-base-url==2.1.0
 pillow>=10.0
+pytest-xdist==3.8.0

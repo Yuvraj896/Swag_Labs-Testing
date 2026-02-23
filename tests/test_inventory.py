@@ -63,13 +63,18 @@ def test_add_to_cart_and_remove_from_cart(login_as_standard_user, product_name):
     dashboard_page.assert_shopping_badge_value(0)
 
 
-def test_all_products_cart_and_remove_functionality(add_all_products):
+@pytest.mark.parametrize(
+        "user",
+        ["login_as_standard_user"],
+        indirect=True
+)
+def test_all_products_cart_and_remove_functionality(user, add_all_products):
     """
     1. Logs in as a standard user and navigates to the inventory page.
     2. Clicks the "Add to Cart" button for each product on the inventory page and verifies that the shopping cart badge updates to reflect the total number of items added.
     3. Clicks the "Remove" button for each product and verifies that the shopping cart badge updates accordingly, eventually disappearing when all items are removed.
     """
-    page = add_all_products
+    page, _ = add_all_products
     dashboard_page = DashboardPage(page)
 
     expected_cart_count = len(products)

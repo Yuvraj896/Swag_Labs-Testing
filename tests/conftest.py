@@ -13,7 +13,7 @@ from test_data.product_data import products, allowed_cart
 @pytest.fixture(scope="function")
 def browser():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=500)
+        browser = p.chromium.launch(headless=False)
         yield browser
         browser.close()
 
@@ -115,8 +115,10 @@ def cart_state(request):
 # user fixture that resolves a login
 @pytest.fixture
 def user(request):
-    return request.getfixturevalue(request.param)
-
+    if hasattr(request, "param"):
+        return request.getfixturevalue(request.param)
+    
+    return request.getfixturevalue("login_as_standard_user")
 
 
 #--------------------_For Cart Page------------------

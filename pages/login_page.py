@@ -73,7 +73,6 @@ class LoginPage :
         self.enter_username(username)
         self.enter_password(password)
         self.press_login()
-        self.wait_for_successful_login()
 
     
     #-------------Post actions--------------
