@@ -14,6 +14,7 @@ class DashboardPage :
     SECONDARY_HEADER = '[data-test="secondary-header"]'
     PRODUCTS_TITLE = f'{SECONDARY_HEADER} >> [data-test="title"]'
     FILTER_BUTTON = f'{SECONDARY_HEADER} >> [data-test="product-sort-container"]'
+    CURRENT_FILTER = f'{FILTER_BUTTON} >> .active_option'
 
     #------------Products------------
     INVENTORY_CONTAINER = '[data-test="inventory-container"]'
@@ -27,6 +28,7 @@ class DashboardPage :
     ITEM_PRICE = '[data-test="inventory-item-price"]'
     ITEM_NAME = '[data-test="inventory-item-name"]'
     BACK_TO_PRODUCTS_BUTTON = '[data-test="back-to-products"]'
+    ITEM_IMG_DIV = '.inventory_item_img'
 
     #-------------Separate Product Page Selectors------------
     DETAILS_ITEM_IMG = '.inventory_details_img'
@@ -82,7 +84,6 @@ class DashboardPage :
     
     @property
     def shopping_cart_badge(self) -> Locator:
-        print(self.page.locator(self.SHOPPING_CART_BADGE))
         return self.page.locator(self.SHOPPING_CART_BADGE)
     
     @property
@@ -133,7 +134,9 @@ class DashboardPage :
     def logout_button(self) -> Locator:
         return self.page.locator(self.LOGOUT_BUTTON)
 
-    
+    @property
+    def active_filter(self) -> Locator:
+        return self.page.locator(f'{self.FILTER_BUTTON} option:checked')
 
     #-------------Helper----------------
     def get_inventory_items_count(self) -> int:
@@ -144,9 +147,14 @@ class DashboardPage :
     
     def get_remove_button(self, index: int) -> Locator:
         return self.page.locator(self.REMOVE_BUTTON).nth(index)
+    
+    def get_remove_button_by_name(self, product_name) -> None:
+        product_card = self.inventory_items.filter(has_text=product_name)
+        remove_button = product_card.locator(self.REMOVE_BUTTON_FIELD)
+        return remove_button
 
     #-------------navigations--------------
-    def open_cart(self) -> None :
+    def open_cart_page(self) -> None :
         self.shopping_cart_button.click()
         self.assert_cart_page()
 
@@ -171,33 +179,6 @@ class DashboardPage :
     def assert_product_count(self, expected_count: int) -> None:
         actual_count = self.get_inventory_items_count()
         assert actual_count == expected_count, f"Expected {expected_count} products, but found {actual_count}"
-
-    def assert_product_visible(self, products, added_products : list = [] )-> None:
-        """
-        1. Assert product count
-        2. Assert each product's details: name, image, description, price
-        3. If product is added to cart, assert remove button is visible
-        """
-
-        expected_count = len(products)
-
-        for i in range(expected_count):
-            product_card = self.inventory_items.nth(i)
-            product = products[i]
-
-            product_name = product_card.locator(self.ITEM_NAME).inner_text()
-
-            if product_name in added_products:
-                expect(product_card.locator(self.REMOVE_BUTTON_FIELD)).to_be_visible()
-
-            # assert product details
-            expect(product_card.locator(self.ITEM_NAME)).to_have_text(product.name)
-
-            expect(product_card.locator(self.ITEM_IMG)).to_have_attribute("src", product.image_path)
-            expect(product_card.locator(self.ITEM_NAME)).to_have_text(product.name)
-            expect(product_card.locator(self.ITEM_DESC)).to_contain_text(product.description)
-            expect(product_card.locator(self.ITEM_PRICE)).to_have_text(f"${product.price:.2f}")
-
 
     def wait_until_page_fields_are_ready(self) -> None:
         fields = (self.page_heading, self.products_title, self.shopping_cart_button, self.inventory_container)
@@ -227,7 +208,16 @@ class DashboardPage :
     def assert_cart_page(self) -> None:
         expect(self.page).to_have_url(self.CART_URL)
 
+    def assert_filter_applied(self, expected_filter: str) -> None:
+        selected_option = self.active_filter.inner_text()
+
+        try :
+            assert selected_option == expected_filter, f"Expected filter option '{expected_filter}' to be applied, but found '{selected_option}'"
+
+        except AssertionError as e:
+            print("Filter application assertion failed:", e)
     
+
  
     #--------------actions---------------
     def click_add_to_cart(self, index: int = 0) -> None:
@@ -273,7 +263,9 @@ class DashboardPage :
 
     #-------------Post actions--------------
 
-    
+    def handle_dialog(self, dialog):
+        self.dialog_message = dialog.message
+        dialog.accept()
   
   
     #-------------E2E Flows--------------
@@ -343,7 +335,7 @@ class DashboardPage :
 
         self.wait_until_page_fields_are_ready()
         self.click_add_to_cart()
-        self.open_cart()
+        self.open_cart_page()
         self.open_dashboard_page_from_cart_page()
         self.assert_shopping_badge_value(1)
             
@@ -369,4 +361,45 @@ class DashboardPage :
         except AssertionError as e:
             print("Remove button failed for problem_user:", e)
 
+
+    def filter_behaviour_on_problem_user(self, products) -> None:
+        """
+        1. Assert Product count
+        2. Assert Filter sorting didn't worked for problem_user
+        3. Check The product details
+        """
+        expected_count = len(products)
         
+        for i in range(expected_count):
+            product_card = self.inventory_items.nth(i)
+            product = products[i]
+
+            expect(product_card.locator(self.ITEM_NAME)).to_have_text(product.name)
+
+            expect(product_card.locator(self.ITEM_IMG)).to_have_attribute("src", re.compile(r"sl-404", re.I))
+
+
+
+    def assert_product_visible(self, products, added_products : list = [] )-> None:
+        """
+        1. Assert product count
+        2. Assert each product's details: name, image, description, price
+        3. If product is added to cart, assert remove button is visible
+        """
+
+        expected_count = len(products)
+
+        for i in range(expected_count):
+            product_card = self.inventory_items.nth(i)
+            product = products[i]
+
+            product_name = product_card.locator(self.ITEM_NAME).inner_text()
+
+            if product_name in added_products:
+                expect(product_card.locator(self.REMOVE_BUTTON_FIELD)).to_be_visible()
+
+            # assert product details
+            expect(product_card.locator(self.ITEM_IMG)).to_have_attribute("src", product.image_path)
+            expect(product_card.locator(self.ITEM_NAME)).to_have_text(product.name)
+            expect(product_card.locator(self.ITEM_DESC)).to_contain_text(product.description)
+            expect(product_card.locator(self.ITEM_PRICE)).to_have_text(f"${product.price:.2f}")

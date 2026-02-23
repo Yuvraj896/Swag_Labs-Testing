@@ -11,7 +11,8 @@ class LoginPage :
 
     #---------------page texts------------------
     LOGIN_HEADING = re.compile(r"Swag Labs", re.I)
-
+    ERROR_MESSAGE_FIELD = '[data-test="error"]'
+    LOGIN_ERROR_MESSAGE = re.compile("Sorry, this user has been locked out", re.I)
 
     #---------------Validations-----------
     INVENTORY_URL = re.compile(r"inventory.html", re.I)
@@ -37,6 +38,9 @@ class LoginPage :
     def login_heading(self) -> Locator:
         return self.page.get_by_text(self.LOGIN_HEADING)
     
+    @property
+    def error_message(self) -> Locator:
+        return self.page.locator(self.ERROR_MESSAGE_FIELD)
 
     #-------------navigations--------------
     def open_page(self, url) -> None:
@@ -53,6 +57,8 @@ class LoginPage :
         for field in fields:
             expect(field).to_be_visible()
     
+    def wait_for_login_error(self) -> None:
+        expect(self.error_message).to_have_text(self.LOGIN_ERROR_MESSAGE)
     #--------------actions---------------
     def enter_username(self, username) -> None:
         self.username.fill(username)
@@ -63,10 +69,11 @@ class LoginPage :
     def press_login(self) -> None:
         self.submit.click()
 
-    def login(self, username, password) -> None:
+    def login(self, username, password = "secret_sauce") -> None:
         self.enter_username(username)
         self.enter_password(password)
         self.press_login()
+        self.wait_for_successful_login()
 
     
     #-------------Post actions--------------
@@ -75,7 +82,7 @@ class LoginPage :
 
     
     #-------------E2E Flows--------------
-    def open_and_login(self, url: str, username: str, password: str) -> None:
+    def open_and_login(self, url: str, username: str, password: str = "secret_sauce") -> None:
         """
         1. Navigate to the login page URL.
         2. Wait until the login page fields are visible and enabled.
@@ -86,6 +93,8 @@ class LoginPage :
         """
         self.open_page_and_wait_until_page_is_ready(url)
         self.login(username, password)
-        self.wait_for_successful_login()
+
+        if username != "locked_out_user" :
+            self.wait_for_successful_login()
 
 

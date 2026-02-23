@@ -6,7 +6,9 @@ from config import URL
 from playwright.sync_api import sync_playwright
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
-from test_data.product_data import products
+from pages.cart_page import CartPage
+from pages.checkout_page import CheckoutPage
+from test_data.product_data import products, allowed_cart
 
 @pytest.fixture(scope="function")
 def browser():
@@ -49,16 +51,25 @@ def login_as_problem_user(login):
 def login_as_visual_user(login):
     return login("visual_user")
 
+@pytest.fixture(scope="function")
+def login_as_locked_out_user(login):
+    return login("locked_out_user")
 
 @pytest.fixture(scope="function")
-def add_no_products(login_as_standard_user):
-    page = login_as_standard_user
+def login_as_error_user(login):
+    return login("error_user")
+
+
+@pytest.fixture(scope="function")
+def add_no_products(user):
+    page = user
     return page, []
 
 
+
 @pytest.fixture(scope="function")
-def add_all_products(login_as_standard_user):
-    page = login_as_standard_user
+def add_all_products(user):
+    page = user
     dashboard_page = DashboardPage(page)
     dashboard_page.is_inventory_page()
     dashboard_page.wait_until_page_fields_are_ready()
@@ -70,8 +81,8 @@ def add_all_products(login_as_standard_user):
 
 
 @pytest.fixture(scope="function")
-def add_some_products(login_as_standard_user):
-    page = login_as_standard_user
+def add_some_products(user):
+    page = user
     dashboard_page = DashboardPage(page)
     dashboard_page.is_inventory_page()
     dashboard_page.wait_until_page_fields_are_ready()
@@ -84,7 +95,51 @@ def add_some_products(login_as_standard_user):
     return page, random_products
 
 
+@pytest.fixture
+def add_allowed_items(user):
+    page = user
+    dashboard_page = DashboardPage(page)
+    dashboard_page.wait_until_page_fields_are_ready()
 
+    for product, isAllowed in allowed_cart.items():
+        if isAllowed:
+            dashboard_page.add_to_cart_by_product_name(product_name=product)
+
+    return page
+
+# cart_state fixture resolves the cart content
 @pytest.fixture
 def cart_state(request):
     return request.getfixturevalue(request.param)
+
+# user fixture that resolves a login
+@pytest.fixture
+def user(request):
+    return request.getfixturevalue(request.param)
+
+
+
+#--------------------_For Cart Page------------------
+
+#this fixture just make sure you have a cart state and move to cart page
+@pytest.fixture
+def cart_page_with_products(cart_state):
+    page, added_products = cart_state
+    DashboardPage(page).open_cart_page()
+    return page, added_products
+
+@pytest.fixture
+def cart_page_navigate(user):
+    page = user
+    DashboardPage(page).open_cart_page()
+    return page
+
+
+#--------------------For checkout page-----------------
+
+@pytest.fixture
+def checkout_page_navigate(cart_page_navigate):
+    page = cart_page_navigate
+    CartPage(page).checkout_button.click()
+    CheckoutPage(page).is_checkout_page()
+    return page

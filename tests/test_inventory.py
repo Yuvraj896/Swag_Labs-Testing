@@ -2,7 +2,7 @@ import re
 import pytest
 from playwright.sync_api import Locator, expect
 from pages.dashboard_page import DashboardPage
-from test_data.product_data import products
+from test_data.product_data import products, allowed_cart
 from test_data.filter_data import Filter
 
 
@@ -97,3 +97,89 @@ def test_product_images(login_as_standard_user, assert_snapshot, subtests):
         
             ss = product_image.screenshot()
             assert_snapshot(ss, name=f"product_{i+1}_image.png")
+
+
+def test_product_images_in_problem_user(login_as_problem_user, assert_snapshot, subtests):
+    """
+    1. Login as a problem user
+    2. Assert if the product image is broken for all the products in inventory
+    """
+    page = login_as_problem_user
+    dashboard_page = DashboardPage(page)
+
+    expected_count = len(products)
+
+    for i in range(expected_count):
+        with subtests.test(msg=f"Product {i+1} image for problem user"):
+            product_card = dashboard_page.inventory_items.nth(i)
+            product_image = product_card.locator(dashboard_page.ITEM_IMG_DIV).first
+        
+            ss = product_image.screenshot()
+            assert_snapshot(ss, name=f"dogesh.jpg")
+
+
+@pytest.mark.parametrize(
+    "user",
+    [
+        "login_as_problem_user",
+        "login_as_error_user"
+    ],
+    indirect=True
+)
+def test_other_user_add_and_remove_from_cart(user, request):
+    '''
+    1. For each users in user, Already on dashboard page
+    2. iterate through all the products in inventory and try to add them to cart
+    3. Assert if the expected items added to the cart and the others didn't
+    '''
+    
+    page = user
+    dashboard_page = DashboardPage(page)
+    
+    dashboard_page.wait_until_page_fields_are_ready()
+    dashboard_page.assert_number_of_products()
+    cart_count = 0 
+    for product, isAllowed in allowed_cart.items():
+        # add to cart
+        dashboard_page.add_to_cart_by_product_name(product)
+        
+        # if allowed then remove button must appear
+        remove_button = dashboard_page.get_remove_button_by_name(product)
+        
+        if(isAllowed):
+            cart_count += 1
+            expect(remove_button).to_be_visible()
+            dashboard_page.assert_shopping_badge_value(cart_count)
+
+        else :
+            expect(remove_button).not_to_be_visible()
+            dashboard_page.assert_shopping_badge_value(cart_count)
+
+
+
+#concept : this parametrize will make a user --> "add_allowed_items" dependds on user fixture --> See if the user is created --> already created --> then This fixture will run and return us the allowed items added cart
+
+@pytest.mark.parametrize(
+        "user",
+        [
+            "login_as_problem_user",
+            "login_as_error_user"
+        ],
+        indirect=True
+)
+def test_remove_button_not_working(add_allowed_items):
+    page = add_allowed_items
+    dashboard_page = DashboardPage(page)
+
+    added_items_cnt = 3
+
+    for product, isAllowed in allowed_cart.items():
+        remove_button = dashboard_page.get_remove_button_by_name(product_name=product)
+
+        if isAllowed:
+            #assuming the item is already added and works
+            dashboard_page.remove_by_product_name(product_name=product)
+
+            #remove should not work
+            expect(remove_button).to_be_visible()
+            dashboard_page.assert_shopping_badge_value(added_items_cnt)

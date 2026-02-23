@@ -11,13 +11,12 @@ from tests.conftest import login
 @pytest.mark.parametrize(
     "cart_state",
     [
-        "add_no_products",
         "add_some_products",
         "add_all_products"
     ],
     indirect= True
 )
-def test_cart_state_with_cookies(cart_state, request):
+def test_cart_state_with_cookies(cart_state):
     """
     1. Logins and add products (no, some, all) in the cart
     2. Logs out

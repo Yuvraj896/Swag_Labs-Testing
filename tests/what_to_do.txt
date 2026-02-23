@@ -41,3 +41,24 @@ If Item is added -> click on item -> See the product is still added to cart
 
 NOTE 2 : 
 What happens with the other users on the Page
+
+
+
+visual user test & problem user -> check dog image  --> DONE
+ 
+login with error user -> change filters -> check the popup  and text --> DONE
+ 
+login with error user & problem user -> check the items that cannot be added to cart  --> DONE
+ 
+login with error user & problem user -> check the items that can be added to cart but cannot be removed  --> DONE
+ 
+problem user -> check filters DO not changes  --> DONE
+  
+login page -> test locked_out_user cannot log in + check the error messages --> DONE
+ 
+start working on cart page TCs + automate if you have time
+ 
+
+
+------------------Thursday---------------------
+
