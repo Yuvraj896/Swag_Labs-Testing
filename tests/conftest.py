@@ -110,7 +110,11 @@ def add_allowed_items(user):
 # cart_state fixture resolves the cart content
 @pytest.fixture
 def cart_state(request):
-    return request.getfixturevalue(request.param)
+    if hasattr(request, "param"):
+        return request.getfixturevalue(request.param)
+
+    return request.getfixturevalue("add_no_products")
+
 
 # user fixture that resolves a login
 @pytest.fixture
@@ -145,3 +149,21 @@ def checkout_page_navigate(cart_page_navigate):
     CartPage(page).checkout_button.click()
     CheckoutPage(page).is_checkout_page()
     return page
+
+
+@pytest.fixture(autouse=True)
+def show_browser(browser_name):
+    print(f"\n=== Running on {browser_name.upper()} ===")
+
+
+#-----------------For Order page-----------------
+@pytest.fixture
+def order_page_navigate(cart_page_with_products):
+    page, added_products = cart_page_with_products
+    CartPage(page).checkout_button.click()
+    checkout_page = CheckoutPage(page)
+    checkout_page.is_checkout_page()
+    checkout_page.fill_form_and_continue()
+    
+    return page, added_products
+

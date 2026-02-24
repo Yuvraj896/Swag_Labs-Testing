@@ -8,6 +8,9 @@ from test_data.product_data import  Product, products
 from test_data.filter_data import Filter
 
 #-----------------Parametrize over cart_state and filter_option --> Indirect param -----------------
+pytestmark = pytest.mark.filters
+
+
 
 @pytest.mark.parametrize(
     "cart_state", 
@@ -22,6 +25,7 @@ from test_data.filter_data import Filter
     "filter_option",
     list(Filter)[1:]
 )
+@pytest.mark.regression
 def test_filter_behaviour(cart_state, filter_option):
     page, added_products = cart_state
     
@@ -35,6 +39,8 @@ def test_filter_behaviour(cart_state, filter_option):
     "filter_option",
     list(Filter)[1:]
 )
+@pytest.mark.negative
+@pytest.mark.regression
 def test_problem_user_filter(login_as_problem_user, filter_option):
     page = login_as_problem_user
     dashboard_page = DashboardPage(page)
@@ -48,6 +54,8 @@ def test_problem_user_filter(login_as_problem_user, filter_option):
     "filter_option",
     list(Filter)[1:]
 )
+@pytest.mark.negative
+@pytest.mark.regression
 def test_error_user_filter(login_as_error_user, filter_option):
     """
     1. Login as Error user

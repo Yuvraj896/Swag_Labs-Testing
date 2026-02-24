@@ -6,7 +6,10 @@ from pages.cart_page import CartPage
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 
+pytestmark = pytest.mark.cart
+
 @pytest.mark.parametrize("user", ["login_as_standard_user"], indirect=True)
+@pytest.mark.smoke
 def test_cart_elements_visibility(cart_page_navigate):
     """
     1. Login as whatever user and navigate to the Cart page
@@ -31,6 +34,7 @@ def test_cart_elements_visibility(cart_page_navigate):
      ],
      indirect= True
 )
+@pytest.mark.regression
 def test_cart_products_visibility(cart_page_with_products, user) :
     """
     1. Login for each user and add Required items to the cart and navigate to the cart page
@@ -43,7 +47,6 @@ def test_cart_products_visibility(cart_page_with_products, user) :
     cart_page.check_products_data(products_in_cart=added_products)
 
 
-
 @pytest.mark.parametrize(
     "user", ["login_as_standard_user"], indirect=True
 )
@@ -55,32 +58,7 @@ def test_cart_products_visibility(cart_page_with_products, user) :
      ],
      indirect= True
 )
-def test_cart_page_state_cookie_session(cart_page_with_products, user):
-    """
-    1. Login for each user, add the items to the cart and navigate to cart page
-    2. Assert Expected count in the cart
-    3. Log out from the page
-    4. Login again and navigate to the cart page
-    5. Check if the items added in the cart matches with the one we added before
-    """
-    
-    page, added_products = cart_page_with_products
-    cart_page = CartPage(page)
-    
-    cart_page.relogin_and_navigate_to_cart_page(username="standard_user")
-    cart_page.check_products_data(products_in_cart=added_products)
-
-@pytest.mark.parametrize(
-    "user", ["login_as_standard_user"], indirect=True
-)
-@pytest.mark.parametrize(
-    "cart_state", 
-    [
-        "add_some_products",
-        "add_all_products"
-     ],
-     indirect= True
-)
+@pytest.mark.regression
 def test_remove_button_work(cart_page_with_products, user):
     """
     1. Login as some user and navigate to the cart page

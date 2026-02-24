@@ -8,6 +8,7 @@ from pages.checkout_page import CheckoutPage
 from test_data.product_data import  Product, products
 from test_data.filter_data import Filter
 
+pytestmark = pytest.mark.checkout
 
 #---------remove param , -> Login as st user----------
 @pytest.mark.parametrize(
@@ -15,11 +16,12 @@ from test_data.filter_data import Filter
         ["login_as_standard_user"],
         indirect=True
 )
+@pytest.mark.smoke
 def test_checkout_success(checkout_page_navigate, user):
     page = checkout_page_navigate
     checkout_page = CheckoutPage(page)
 
-    checkout_page.fill_form(
+    checkout_page.fill_form_and_continue(
         first_name="Jon",
         last_name="Snow",
         zip_code="123"
@@ -37,6 +39,7 @@ def test_checkout_success(checkout_page_navigate, user):
     ("John", "", "12345"),
     ("John", "Doe", ""),
 ])
+@pytest.mark.negative
 def test_checkout_validation_errors(checkout_page_navigate, first, last, zip_code, user):
     checkout_page = CheckoutPage(checkout_page_navigate)
 

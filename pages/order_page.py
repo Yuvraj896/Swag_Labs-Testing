@@ -95,7 +95,7 @@ class OrderPage :
     def shopping_cart_badge_value(self) -> int:
         badge = self.shopping_badge
         if badge.count() == 0 : return 0
-        return int(self.shopping_cart_badge.inner_text())
+        return int(self.shopping_badge.inner_text())
     
     @property
     def get_cart_items_count(self) -> int:
@@ -107,7 +107,7 @@ class OrderPage :
         """
         Return a locator of inventory Item of the required item
         """
-        if self.is_cart_empty:
+        if self.is_cart_empty():
             raise AssertionError("Cart is empty, No Inventory items found")
 
         if item_name:
@@ -137,28 +137,48 @@ class OrderPage :
         }
     
     def get_item_price(self, item_name = None, index = None) -> float:
-    
+        """
+        Returns the price of any item , by its name or index
+        """
         item = self.get_inventory_item(item_name=item_name, index=index) 
         price = item.locator(self.ITEM_PRICE_FIELD).inner_text()  
         return float(price.replace("$", ""))
     #-------------------Asserts-----------------
 
+    def is_cart_empty(self) -> None:
+        return self.inventory_items.count() == 0 
+
     def is_order_page(self) -> None:
+        """
+        Asserts if we are on order page
+        """
+
         expect(self.page).to_have_url(self.URL)
 
     def assert_fields_loaded(self) -> None:
+        """
+        Make sures page and the locators are fully loaded
+        """
+
         fields = (self.burger_navigate_button, self.shopping_cart_link, self.checkout_overview, self.cart_list, self.payment_info, self.ship_info, self.item_total, self.tax, self.grand_total)
 
         for field in fields:
             expect(field).to_be_visible()
 
     def assert_shopping_badge_value_equal_as_cart_cnt(self) -> None:
+        """
+        Checks if the Number of items in cart is equal as the shopping cart badge value
+        """
         cart_cnt = self.get_cart_items_count
         shopping_badge_cnt = self.shopping_cart_badge_value
 
         assert cart_cnt == shopping_badge_cnt, f"Expected {cart_cnt} , but found {shopping_badge_cnt}"
 
     def assert_no_of_items_in_cart(self, expected_cnt) -> None:
+        """
+        Checks if the count of products in cart is equal as expected count
+        """
+        
         actual_cnt = self.get_cart_items_count
         assert actual_cnt == expected_cnt, f"Expected {expected_cnt} products, but found {actual_cnt}"
 
@@ -171,6 +191,9 @@ class OrderPage :
     
 
     def check_products_data(self, products_in_cart : List[Product]) -> None: 
+        """
+        Asserts the data of product added to the cart is same as the Products list
+        """
         expected_count = len(products_in_cart)
         self.assert_no_of_items_in_cart(expected_count= expected_count)
 
@@ -184,5 +207,34 @@ class OrderPage :
             assert float(item_details["price"].replace("$", "")) == product.price, f"Price mismatch for {product.name}"
 
     def check_grand_total(self, products_in_cart : List[Product]) -> None:
-        pass
+        """
+        Asserts if the sum of prices of all the items added to the cart is equal to the List of products in cart
+        And Asserts if the the grand total summation is correct
+        """
 
+        self.assert_no_of_items_in_cart(expected_cnt=len(products_in_cart))
+        
+        expected_total = 0.0
+        actual_total = 0.0
+        for product in products_in_cart:
+            expected_total += product.price
+            item_price = self.get_item_price(item_name=product.name)
+            actual_total += item_price
+
+
+        assert abs(expected_total - actual_total) < 0.01, \
+        f"Expected total {expected_total}, but got {actual_total}"
+
+        def get_price_value(locator : Locator) -> float:
+            text = locator.inner_text()
+            price = float(text.split("$")[1])
+            return price
+
+        tax = get_price_value(self.tax)
+        expected_grand_total = expected_total + tax
+
+        actual_grand_total = get_price_value(self.grand_total)
+    
+        assert abs(expected_grand_total - actual_grand_total) < 0.01, \
+            f"Expected grand total {expected_grand_total}, but got {actual_grand_total}"
+        

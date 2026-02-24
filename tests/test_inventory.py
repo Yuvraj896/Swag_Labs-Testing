@@ -6,6 +6,9 @@ from test_data.product_data import products, allowed_cart
 from test_data.filter_data import Filter
 
 
+pytestmark = pytest.mark.inventory
+
+@pytest.mark.smoke
 def test_dashboard_elements_visibility(login_as_standard_user):
     """
     1. Logs in as a standard user and navigates to the inventory page.
@@ -17,7 +20,7 @@ def test_dashboard_elements_visibility(login_as_standard_user):
     dashboard_page.is_inventory_page()
     dashboard_page.assert_page_headers_visible()
 
-
+@pytest.mark.smoke
 def test_inventory_page_product_details(login_as_standard_user):
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)
@@ -31,6 +34,7 @@ def test_inventory_page_product_details(login_as_standard_user):
         [(index, product) for index, product in enumerate(products)],
         ids= [product.name for product in products]
         )
+@pytest.mark.regression
 def test_each_product_page(login_as_standard_user, product_index, product):
     """
     1. Logs in as a standard user and navigates to the inventory page.
@@ -46,6 +50,7 @@ def test_each_product_page(login_as_standard_user, product_index, product):
 
 
 @pytest.mark.parametrize("product_name", [product.name for product in products])
+@pytest.mark.smoke
 def test_add_to_cart_and_remove_from_cart(login_as_standard_user, product_name):
     """
     1. Logs in as a standard user and navigates to the inventory page.
@@ -68,6 +73,7 @@ def test_add_to_cart_and_remove_from_cart(login_as_standard_user, product_name):
         ["login_as_standard_user"],
         indirect=True
 )
+@pytest.mark.smoke
 def test_all_products_cart_and_remove_functionality(user, add_all_products):
     """
     1. Logs in as a standard user and navigates to the inventory page.
@@ -87,7 +93,7 @@ def test_all_products_cart_and_remove_functionality(user, add_all_products):
     dashboard_page.assert_shopping_badge_value(0)
 
 
-
+@pytest.mark.slow
 def test_product_images(login_as_standard_user, assert_snapshot, subtests):
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)
@@ -103,7 +109,8 @@ def test_product_images(login_as_standard_user, assert_snapshot, subtests):
             ss = product_image.screenshot()
             assert_snapshot(ss, name=f"product_{i+1}_image.png")
 
-
+@pytest.mark.slow
+@pytest.mark.negative
 def test_product_images_in_problem_user(login_as_problem_user, assert_snapshot, subtests):
     """
     1. Login as a problem user
@@ -131,6 +138,8 @@ def test_product_images_in_problem_user(login_as_problem_user, assert_snapshot, 
     ],
     indirect=True
 )
+@pytest.mark.negative
+@pytest.mark.smoke
 def test_other_user_add_and_remove_from_cart(user, request):
     '''
     1. For each users in user, Already on dashboard page
@@ -172,6 +181,8 @@ def test_other_user_add_and_remove_from_cart(user, request):
         ],
         indirect=True
 )
+@pytest.mark.smoke
+@pytest.mark.negative
 def test_remove_button_not_working(add_allowed_items):
     page = add_allowed_items
     dashboard_page = DashboardPage(page)

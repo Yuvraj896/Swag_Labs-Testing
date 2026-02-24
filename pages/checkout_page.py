@@ -3,8 +3,7 @@ import pytest
 from typing import List
 from playwright.sync_api import Locator, Page, expect
 from test_data.product_data import products, Product
-from pages.login_page import LoginPage
-from pages.dashboard_page import DashboardPage
+from pages.order_page import OrderPage
 
 
 class CheckoutPage :
@@ -12,7 +11,6 @@ class CheckoutPage :
     BURGER_MENU_FIELD = '.bm-burger-button > button'
     SHOPPING_CART_LINK = '[data-test="shopping-cart-link"]'
     SHOPPING_CART_BADGE = '[data-test="shopping-cart-badge"]'
-    
     
     FIRST_NAME_FIELD = '[data-test="firstName"]'
     LAST_NAME_FIELD = '[data-test="lastName"]'
@@ -94,8 +92,11 @@ class CheckoutPage :
         self.zip_code.fill(zip_code)
 
 
-    def fill_form(self, first_name : str, last_name : str, zip_code : str) -> None:
+    def fill_form_and_continue(self, first_name : str = "Jon", last_name : str = "Snow", zip_code : str = "GOT") -> None:
         self.fill_details(first_name, last_name, zip_code)
         self.continue_button.click()    
 
+    def navigate_to_order_page(self) :
+        self.continue_button.click()
+        OrderPage(self.page).is_order_page()
 
