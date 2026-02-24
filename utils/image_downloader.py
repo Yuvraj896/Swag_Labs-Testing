@@ -2,6 +2,7 @@ import requests
 import os
 from dotenv import load_dotenv
 
+
 from pathlib import Path
 from test_data.product_data import products
 
@@ -13,6 +14,8 @@ IMAGE_DIR = Path(IMAGE_PATH)
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 def normalize_image_name(name: str) -> str:
+    import pdb
+    pdb.set_trace()
     return (name.lower().replace(" ", "_").replace("(", "").replace(")", "").replace(".", "")) + ".jpg"
 
 def download_all_product_images():

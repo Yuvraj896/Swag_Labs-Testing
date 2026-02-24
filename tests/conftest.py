@@ -145,7 +145,7 @@ def cart_page_navigate(user):
 
 @pytest.fixture
 def checkout_page_navigate(cart_page_navigate):
-    page = cart_page_navigate
+    page = cart_page_navigate       
     CartPage(page).checkout_button.click()
     CheckoutPage(page).is_checkout_page()
     return page
@@ -166,4 +166,7 @@ def order_page_navigate(cart_page_with_products):
     checkout_page.fill_form_and_continue()
     
     return page, added_products
+
+
+
 

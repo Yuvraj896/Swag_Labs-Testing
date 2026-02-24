@@ -54,7 +54,7 @@ def test_cart_state_with_cookies(cart_state):
      indirect= True
 )
 @pytest.mark.regression
-def test_cart_page_state_cookie_session(cart_page_with_products, user):
+def test_cart_page_state_cookie_session(user, cart_page_with_products):
     """
     1. Login for each user, add the items to the cart and navigate to cart page
     2. Assert Expected count in the cart
@@ -68,3 +68,22 @@ def test_cart_page_state_cookie_session(cart_page_with_products, user):
     
     cart_page.relogin_and_navigate_to_cart_page(username="standard_user")
     cart_page.check_products_data(products_in_cart=added_products)
+
+
+#this test -> cart_page_with_products -> cart_state -> request(add_some_products) -> user  <--- this is not directly called by the parameter fixture  {request one are dynamic dependency} therefore, we have to pass user as parameter , so it creates user also
+
+
+"""
+test
+ ├── user
+ │    └── login_as_standard_user
+ │         └── login
+ │              └── page
+ │                   └── context
+ │                        └── browser
+ │
+ └── cart_page_with_products
+      └── cart_state (parametrized)
+           └── add_some_products (parametrized)
+                └── user
+"""

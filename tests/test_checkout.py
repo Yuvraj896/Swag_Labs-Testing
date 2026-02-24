@@ -17,7 +17,7 @@ pytestmark = pytest.mark.checkout
         indirect=True
 )
 @pytest.mark.smoke
-def test_checkout_success(checkout_page_navigate, user):
+def test_checkout_success(checkout_page_navigate):
     page = checkout_page_navigate
     checkout_page = CheckoutPage(page)
 
@@ -28,6 +28,7 @@ def test_checkout_success(checkout_page_navigate, user):
     )
 
     expect(page).to_have_url(checkout_page.ORDER_PAGE_URL)
+
 
 @pytest.mark.parametrize(
     "user",
@@ -40,7 +41,7 @@ def test_checkout_success(checkout_page_navigate, user):
     ("John", "Doe", ""),
 ])
 @pytest.mark.negative
-def test_checkout_validation_errors(checkout_page_navigate, first, last, zip_code, user):
+def test_checkout_validation_errors(checkout_page_navigate, first, last, zip_code):
     checkout_page = CheckoutPage(checkout_page_navigate)
 
     checkout_page.first_name.fill(first)
@@ -50,4 +51,9 @@ def test_checkout_validation_errors(checkout_page_navigate, first, last, zip_cod
     checkout_page.continue_button.click()
 
     expect(checkout_page.error_message).to_be_visible()
+
+
+# this test --> checkout_page_navigate --> cart_page_navigate --> user --> req.param()  <---- Direct calls user (explicitly requires user)
+
+
 
