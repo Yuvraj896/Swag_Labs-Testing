@@ -146,7 +146,7 @@ class CartPage:
             raise ValueError("Either item_name or index must be provided")
         
 
-    def get_item_details(self, item_name = None, index= None) -> Locator:
+    def get_item_details(self, item_name = None, index= None) -> dict:
         """
         Returns a dict containing the product details
         """
