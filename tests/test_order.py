@@ -6,7 +6,7 @@ from playwright.sync_api import Locator, expect, Page
 from typing import List
 
 from pages.order_page import OrderPage
-from test_data.product_data import  Product, products
+from test_data.product_data import  Product, PRODUCTS
 from test_data.filter_data import Filter
 
 pytestmark = pytest.mark.order

@@ -5,7 +5,7 @@ import pytest
 from playwright.sync_api import Locator, expect, Page
 from pages.dashboard_page import DashboardPage
 from pages.checkout_page import CheckoutPage
-from test_data.product_data import  Product, products
+from test_data.product_data import  Product, PRODUCTS
 from test_data.filter_data import Filter
 
 pytestmark = pytest.mark.checkout

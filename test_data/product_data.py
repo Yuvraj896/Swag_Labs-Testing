@@ -1,6 +1,7 @@
 from ast import List
 from dataclasses import dataclass
 from test_data.filter_data import Filter
+from typing import Final
 
 @dataclass
 class Product:
@@ -23,7 +24,7 @@ class Product:
         
         return products  # fallback if unknown filter
 
-products = [
+PRODUCTS : Final = [
     Product(
         id = 1, 
         name="Sauce Labs Backpack",

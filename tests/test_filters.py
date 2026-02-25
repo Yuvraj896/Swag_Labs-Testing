@@ -4,7 +4,7 @@ from typing import List
 import pytest
 from playwright.sync_api import Locator, expect, Page
 from pages.dashboard_page import DashboardPage
-from test_data.product_data import  Product, products
+from test_data.product_data import  Product, PRODUCTS
 from test_data.filter_data import Filter
 
 #-----------------Parametrize over cart_state and filter_option --> Indirect param -----------------
@@ -31,7 +31,7 @@ def test_filter_behaviour(cart_state, filter_option):
     
     dashboard_page = DashboardPage(page)
     dashboard_page.apply_filter(filter_option=filter_option)
-    sorted_products = Product.sort_products(products, filter_option)
+    sorted_products = Product.sort_products(PRODUCTS, filter_option)
     dashboard_page.assert_product_visible(products=sorted_products, added_products=added_products)
 
 
@@ -47,7 +47,7 @@ def test_problem_user_filter(login_as_problem_user, filter_option):
     dashboard_page.apply_filter(filter_option=filter_option)
 
     dashboard_page.assert_filter_applied(expected_filter= filter_option)
-    dashboard_page.filter_behaviour_on_problem_user(products= products)
+    dashboard_page.filter_behaviour_on_problem_user(products=PRODUCTS)
     
 
 @pytest.mark.parametrize(

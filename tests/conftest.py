@@ -8,7 +8,7 @@ from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
-from test_data.product_data import products, allowed_cart
+from test_data.product_data import PRODUCTS, allowed_cart
 
 @pytest.fixture(scope="function")
 def browser():
@@ -74,10 +74,10 @@ def add_all_products(user):
     dashboard_page.is_inventory_page()
     dashboard_page.wait_until_page_fields_are_ready()
     
-    for product in products:
+    for product in PRODUCTS:
         dashboard_page.add_to_cart_by_product_name(product.name)
 
-    return page, products
+    return page, PRODUCTS
 
 
 @pytest.fixture(scope="function")
@@ -87,7 +87,7 @@ def add_some_products(user):
     dashboard_page.is_inventory_page()
     dashboard_page.wait_until_page_fields_are_ready()
     
-    random_products = random.sample(products, 3)  # Select 3 random products    
+    random_products = random.sample(PRODUCTS, 3)  # Select 3 random products    
 
     for product in random_products:
         dashboard_page.add_to_cart_by_product_name(product.name)

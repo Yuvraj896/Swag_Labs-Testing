@@ -3,7 +3,7 @@ import pytest
 from playwright.sync_api import Locator, expect
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
-from test_data.product_data import products
+from test_data.product_data import PRODUCTS
 from test_data.filter_data import Filter
 from tests.conftest import login
 from pages.cart_page import CartPage
@@ -39,8 +39,9 @@ def test_cart_state_with_cookies(cart_state):
     dashboard_page.is_inventory_page()
 
     # verify the cart state
-    dashboard_page.assert_product_visible(products= products, added_products= added_products)
+    dashboard_page.assert_product_visible(products = PRODUCTS, added_products= added_products)
     
+
 
 @pytest.mark.parametrize(
     "user", ["login_as_standard_user"], indirect=True

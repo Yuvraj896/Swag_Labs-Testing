@@ -2,7 +2,7 @@ import re
 import pytest
 from playwright.sync_api import Locator, expect
 from pages.dashboard_page import DashboardPage
-from test_data.product_data import products, allowed_cart
+from test_data.product_data import PRODUCTS, allowed_cart
 from test_data.filter_data import Filter
 
 
@@ -25,14 +25,14 @@ def test_inventory_page_product_details(login_as_standard_user):
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)
     dashboard_page.is_inventory_page()
-    dashboard_page.assert_product_count(expected_count= len(products))
-    dashboard_page.assert_product_visible(products, [])
+    dashboard_page.assert_product_count(expected_count= len(PRODUCTS))
+    dashboard_page.assert_product_visible(PRODUCTS, [])
 
 
 @pytest.mark.parametrize(
         "product_index, product",
-        [(index, product) for index, product in enumerate(products)],
-        ids= [product.name for product in products]
+        [(index, product) for index, product in enumerate(PRODUCTS)],
+        ids= [product.name for product in PRODUCTS]
         )
 @pytest.mark.regression
 def test_each_product_page(login_as_standard_user, product_index, product):
@@ -49,7 +49,7 @@ def test_each_product_page(login_as_standard_user, product_index, product):
 
 
 
-@pytest.mark.parametrize("product_name", [product.name for product in products])
+@pytest.mark.parametrize("product_name", [product.name for product in PRODUCTS])
 @pytest.mark.smoke
 def test_add_to_cart_and_remove_from_cart(login_as_standard_user, product_name):
     """
@@ -83,7 +83,7 @@ def test_all_products_cart_and_remove_functionality(user, add_all_products):
     page, _ = add_all_products
     dashboard_page = DashboardPage(page)
 
-    expected_cart_count = len(products)
+    expected_cart_count = len(PRODUCTS)
     
     dashboard_page.assert_shopping_badge_value(expected_value=expected_cart_count)  
 
@@ -98,7 +98,7 @@ def test_product_images(login_as_standard_user, assert_snapshot, subtests):
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)
 
-    expected_count = len(products)
+    expected_count = len(PRODUCTS)
 
     for i in range(expected_count):
         # Change 2: Use the 'subtests' fixture here
@@ -119,7 +119,7 @@ def test_product_images_in_problem_user(login_as_problem_user, assert_snapshot, 
     page = login_as_problem_user
     dashboard_page = DashboardPage(page)
 
-    expected_count = len(products)
+    expected_count = len(PRODUCTS)
 
     for i in range(expected_count):
         with subtests.test(msg=f"Product {i+1} image for problem user"):

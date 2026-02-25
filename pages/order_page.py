@@ -2,7 +2,7 @@ import re
 import pytest
 from typing import List
 from playwright.sync_api import Locator, Page, expect
-from test_data.product_data import products, Product
+from test_data.product_data import PRODUCTS, Product
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 

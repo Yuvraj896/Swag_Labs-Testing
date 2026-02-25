@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 
 from pathlib import Path
-from test_data.product_data import products
+from test_data.product_data import PRODUCTS
 
 load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
@@ -13,13 +13,25 @@ IMAGE_PATH = os.getenv("IMAGE_PATH")
 IMAGE_DIR = Path(IMAGE_PATH)
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-def normalize_image_name(name: str) -> str:
+def normalize_image_name(name: str) -> str: 
     import pdb
     pdb.set_trace()
-    return (name.lower().replace(" ", "_").replace("(", "").replace(")", "").replace(".", "")) + ".jpg"
+    #takes O(k * n * m ) times
+    # return (name.lower().replace(" ", "_").replace("(", "").replace(")", "").replace(".", "")) + ".jpg"
+
+    #takes O(n) time as lookup takes O(n * m ) , since m = 1 , Only O(n) time compl
+    table = str.maketrans({
+        " ": "_",
+        "(": "",
+        ")": "",
+        ".": ""
+    })
+
+    cleaned = name.lower().translate(table) + ".jpg"
+    return cleaned
 
 def download_all_product_images():
-    for product in products:
+    for product in PRODUCTS:
         image_url = BASE_URL + product.image_path
         filename = normalize_image_name(product.name)
 
