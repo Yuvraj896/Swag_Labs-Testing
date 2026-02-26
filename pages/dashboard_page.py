@@ -1,5 +1,6 @@
-from playwright.sync_api import Locator, Page, expect
 import re
+from playwright.sync_api import Locator, Page, expect
+from test_data.filter_data import Filter
 
 class DashboardPage :
 
@@ -239,7 +240,7 @@ class DashboardPage :
     def get_filter(self, option: str) -> Locator:
         return self.page.locator(self.FILTER_BUTTON).select_option(label=option)
 
-    def apply_filter(self, filter_option: str) -> None:
+    def apply_filter(self, filter_option: Filter) -> None:
         self.filter_button.click()
         filter_option_locator = self.get_filter(filter_option.value)
 
@@ -309,7 +310,7 @@ class DashboardPage :
         self.click_remove_button()
 
 
-    def add_a_fiter_and_assert_products(self, filter_value: str) -> None:
+    def add_a_fiter_and_assert_products(self, filter_value: Filter) -> None:
         """
         1. Already on dashboard page
         2. wait for page fields to load

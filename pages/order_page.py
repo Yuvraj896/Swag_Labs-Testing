@@ -103,7 +103,7 @@ class OrderPage :
     
     #----------------Private--------------
 
-    def _get_price_value(locator : Locator) -> float:
+    def _get_price_value(self, locator : Locator) -> float:
         text = locator.inner_text()
         price = float(text.split("$")[1])
         return price
@@ -153,7 +153,7 @@ class OrderPage :
         return float(price.replace("$", ""))
     #-------------------Asserts-----------------
 
-    def is_cart_empty(self) -> None:
+    def is_cart_empty(self) -> bool:
         return self.inventory_items.count() == 0 
 
     def is_order_page(self) -> None:
@@ -182,7 +182,7 @@ class OrderPage :
 
         assert cart_cnt == shopping_badge_cnt, f"Expected {cart_cnt} , but found {shopping_badge_cnt}"
 
-    def assert_no_of_items_in_cart(self, expected_cnt) -> None:
+    def assert_no_of_items_in_cart(self, expected_cnt : int) -> None:
         """
         Checks if the count of products in cart is equal as expected count
         """
@@ -203,7 +203,7 @@ class OrderPage :
         Asserts the data of product added to the cart is same as the Products list
         """
         expected_count = len(products_in_cart)
-        self.assert_no_of_items_in_cart(expected_count= expected_count)
+        self.assert_no_of_items_in_cart(expected_cnt = expected_count)
 
         for product in products_in_cart:
 
@@ -233,7 +233,7 @@ class OrderPage :
         assert abs(expected_total - actual_total) < 0.01, \
         f"Expected total {expected_total}, but got {actual_total}"
 
-        tax = self._get_price_valueget_price_value(self.tax)
+        tax = self._get_price_value(self.tax)
         expected_grand_total = expected_total + tax
 
         actual_grand_total = self._get_price_value(self.grand_total)
