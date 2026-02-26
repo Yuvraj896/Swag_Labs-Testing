@@ -30,7 +30,7 @@ class CheckoutPage :
         self.page = page
 
     @property
-    def checkout_text(self) -> Locator:
+    def checkout_text(self) -> str:
         return self.page.locator(self.CHECKOUT_FIELD).inner_text()
     
     @property
@@ -72,15 +72,14 @@ class CheckoutPage :
         return int(self.shopping_cart_badge.inner_text())
 
     @property
-    def press_burger_menu(self) -> None:
-        self.burger_navigate_button.click()
-
-    @property
     def error_message(self) -> Locator:
         return self.page.locator(self.ERROR_FIELD)
 
     def is_checkout_page(self):
         expect(self.page).to_have_url(self.CHECKOUT_URL)
+    
+    def press_burger_menu(self) -> None:
+        self.burger_navigate_button.click()
 
     
     def fill_details(self, first_name : str, last_name : str, zip_code : str):

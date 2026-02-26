@@ -109,18 +109,6 @@ class CartPage:
     @property
     def is_cart_empty(self) -> bool:
         return self.get_cart_items_count == 0
-    
-    @property
-    def press_checkout_button(self) -> None:
-        self.checkout_button.click()
-    
-    @property
-    def press_continue_shopping(self) -> None:
-        self.continue_shopping_button.click()
-
-    @property
-    def press_burger_menu(self) -> None:
-        self.burger_navigate_button.click()
 
 
     #----------Getters------------
@@ -180,13 +168,25 @@ class CartPage:
     
 
     #---------------actions--------------------
+    def press_checkout_button(self) -> None:
+        self.checkout_button.click()
+    
+        
+    def press_continue_shopping(self) -> None:
+        self.continue_shopping_button.click()
+
+
     def press_remove_button(self, item_name = None , index = None) -> None:
         remove_button = self.remove_button(item_name=item_name, index=index)
         remove_button.click()
 
     def press_logout_button(self) -> None:
-        self.press_burger_menu
+        self.press_burger_menu()
         self.logout_button.click()
+
+    def press_burger_menu(self) -> None:
+        self.burger_navigate_button.click()
+
     
     
     def press_remove_button_and_assert_badge_count(self, item_name = None, index = None) -> None:

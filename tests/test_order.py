@@ -31,7 +31,7 @@ def test_order_page_visibility(user, order_page_navigate):
      indirect= True
 )
 @pytest.mark.regression
-def test_order_page_product_details(user, order_page_navigate):
+def test_order_page_product_details(order_page_navigate):
     """
     1. Navigate to order page after adding some items to the cart
     2. Assert if the number of products in cart is correct

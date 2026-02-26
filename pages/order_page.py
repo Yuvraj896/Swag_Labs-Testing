@@ -101,6 +101,14 @@ class OrderPage :
     def get_cart_items_count(self) -> int:
         return self.inventory_items.count()
     
+    #----------------Private--------------
+
+    def _get_price_value(locator : Locator) -> float:
+        text = locator.inner_text()
+        price = float(text.split("$")[1])
+        return price
+
+
     #---------------------Getter--------------
     
     def get_inventory_item(self, item_name = None , index = None) -> Locator:
@@ -225,15 +233,10 @@ class OrderPage :
         assert abs(expected_total - actual_total) < 0.01, \
         f"Expected total {expected_total}, but got {actual_total}"
 
-        def get_price_value(locator : Locator) -> float:
-            text = locator.inner_text()
-            price = float(text.split("$")[1])
-            return price
-
-        tax = get_price_value(self.tax)
+        tax = self._get_price_valueget_price_value(self.tax)
         expected_grand_total = expected_total + tax
 
-        actual_grand_total = get_price_value(self.grand_total)
+        actual_grand_total = self._get_price_value(self.grand_total)
     
         assert abs(expected_grand_total - actual_grand_total) < 0.01, \
             f"Expected grand total {expected_grand_total}, but got {actual_grand_total}"

@@ -13,7 +13,6 @@ def test_dashboard_elements_visibility(login_as_standard_user):
     """
     1. Logs in as a standard user and navigates to the inventory page.
     2. Asserts the visibility of the primary header, page heading, burger menu button, shopping cart button, filter button, and products title.
-    3. Asserts the visibility of each product on the inventory page.
     """
     page = login_as_standard_user
     dashboard_page = DashboardPage(page)

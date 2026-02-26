@@ -10,12 +10,17 @@ from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
 from test_data.product_data import PRODUCTS, allowed_cart
 
-@pytest.fixture(scope="function")
-def browser():
+
+@pytest.fixture(scope="session")
+def playwright():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        yield browser
-        browser.close()
+        yield p
+
+@pytest.fixture(scope="function")
+def browser(playwright):
+    browser = playwright.chromium.launch(headless=False)
+    yield browser
+    browser.close()
 
 @pytest.fixture(scope="function")
 def context(browser):
